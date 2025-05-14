@@ -1,5 +1,7 @@
 from tkinter import *
 
+from imports.KeyHistory import KeyHistory
+
 # -----------------------------------------------------------------------------------------
 # LOGIC
 # -----------------------------------------------------------------------------------------
@@ -7,19 +9,31 @@ from tkinter import *
 user_text = ""
 timer = None
 
+key_history : KeyHistory = KeyHistory() 
+
+EXIT_COMBO : str = "jk" 
 
 def start_calculating(event):
     global timer, user_text
-
+    
     if timer is not None:
         window.after_cancel(timer)
 
-    if event.keysym == "BackSpace":
-        user_text = user_text[0: len(user_text) - 1]
+    pressed_key : str = event.keysym
 
+    if pressed_key == "BackSpace" and len(user_text):
+        user_text = user_text[0: len(user_text) - 1]
+        key_history.remove()
     elif event.char:
         user_text += event.char
-        timer = window.after(1000, reset_app)
+        key_history.insert(event.char)
+        print(key_history.items)
+
+    # previous: pressed_key == "period" or pressed_key == "Return"
+    # TODO: idea -> by sentences
+    if key_history.is_combination_executed(EXIT_COMBO):
+        timer = window.after(10, reset_app)
+    
 
     return
 
@@ -30,6 +44,7 @@ def reset_app():
     typing_area.insert("1.0", "$ ")
     user_text += "\n"
     timer = None
+    key_history.clean()
     return
 
 
@@ -87,7 +102,7 @@ heading = "WRITE WITH MAGICAL INK"
 instruction = "If you don't press any key for 5 seconds, the text you have written will disappear"
 
 window = Tk()
-window.title('Disappearing Text Desktop App')
+window.title('Vanishink')
 window.config(bg=BG, padx=0, pady=0)
 
 heading = Label(text=heading, font=HEAD_FONT, bg=BG, fg=FG, padx=0, pady=0)
@@ -98,6 +113,7 @@ typing_area = Text(font=PARA_FONT,  bg=BG, fg=FG, width=100, height=15, wrap='w'
                    padx=0, pady=0, insertbackground="#fff", insertborderwidth=0, insertwidth=10)
 
 typing_area.insert("1.0", "$ ")
+# TODO dynamic event generation plz:)
 typing_area.event_generate("<<Savingfile>>")
 typing_area.event_add('<<Savingfile>>', '<Control-s>')
 typing_area.bind('<<Savingfile>>', save_text_to_file)
