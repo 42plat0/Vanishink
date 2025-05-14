@@ -5,6 +5,14 @@ from imports.KeyHistory import KeyHistory
 # -----------------------------------------------------------------------------------------
 # LOGIC
 # -----------------------------------------------------------------------------------------
+from time import sleep
+
+SLEEP_TIME : float = 0.1
+
+def vanish(area : Text) -> None:
+    # depends on starting symbol
+    area.delete('1.2', 'end')
+
 
 user_text = ""
 timer = None
@@ -12,6 +20,9 @@ timer = None
 key_history : KeyHistory = KeyHistory() 
 
 EXIT_COMBO : str = "jk" 
+
+def exit_combo_remove(text : str) -> None:
+    return "".join(text.split(EXIT_COMBO))
 
 def start_calculating(event):
     global timer, user_text
@@ -40,8 +51,7 @@ def start_calculating(event):
 
 def reset_app():
     global timer, user_text
-    typing_area.delete('1.0', 'end')
-    typing_area.insert("1.0", "$ ")
+    vanish(typing_area)
     user_text += "\n"
     timer = None
     key_history.clean()
@@ -69,7 +79,7 @@ def save_text_to_file(e=None):
             text_to_write = f'\n{user_text}'
 
         with open('writeups.txt', 'a') as f:
-            f.write(text_to_write)
+            f.write(exit_combo_remove(text_to_write))
             # user_text += "\n"
     finally:
         return
