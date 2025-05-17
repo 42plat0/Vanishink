@@ -15,6 +15,8 @@ class Stack:
         return len(self.items)
 
     def remove(self) -> any:
+        if self.get_size() < 0: return
+
         return self.items.pop()
     
     def clean(self) -> None:
