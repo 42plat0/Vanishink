@@ -10,6 +10,7 @@ ___________________________________________________________________________
 DONE:
     ++++ [feat] vanish func, saving to file text without exit combo
     ++++ [feat] Exiting program
+    ++++ [feat] String validator
 ___________________________________________________________________________
 ---FIX
 [fix] Saves and appends existing text without checking if its the same string

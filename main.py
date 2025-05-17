@@ -41,7 +41,7 @@ def start_calculating(event):
 
     pressed_key : str = event.keysym
 
-    if pressed_key == "BackSpace" and len(user_text):
+    if String.is_equal(pressed_key, "BackSpace") and not String.is_empty(user_text):
         user_text = user_text[0: len(user_text) - 1]
         Editor.Keys.remove()
     elif event.char:
@@ -53,7 +53,7 @@ def start_calculating(event):
     if Editor.Keys.is_combination_executed(BUFFER_CLEAR_COMBO):
         timer = window.after(10, reset_app)
     
-    if Editor.buffer == WINDOW_EXIT_COMBO:
+    if String.is_equal(Editor.buffer, WINDOW_EXIT_COMBO): 
         close_window()
     
     return
@@ -89,7 +89,8 @@ def save_text_to_file(e=None):
         return
     else:
         cont = f.read()
-        if cont == "":
+        
+        if String.is_empty(cont):
             text_to_write = user_text
         # TODO -> check if text is the same? Can use an identifier when built as OOP
         else:
