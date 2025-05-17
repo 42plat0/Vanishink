@@ -1,11 +1,18 @@
 ---------------------------------------------------------------------------
 CURRENT:
-    #-->
+    Getting to version 1: 
+    #--> [feat] Vanish text with more interesting effect  
+    #--> [feat] File saving system
+        // something more sound like preparing a dedicated folder, option of opening up a last note etc..
+    #--> [feat] Adding config for keybindings
 ___________________________________________________________________________
 
 DONE:
     ++++ [feat] vanish func, saving to file text without exit combo
+    ++++ [feat] Exiting program
 ___________________________________________________________________________
+---FIX
+[fix] Saves and appends existing text without checking if its the same string
 
 ---FEAT
 [feat] create config file data

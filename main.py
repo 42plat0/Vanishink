@@ -1,28 +1,37 @@
 from tkinter import *
 
 from imports.KeyHistory import KeyHistory
+from imports.utils.String import String
 
 # -----------------------------------------------------------------------------------------
 # LOGIC
 # -----------------------------------------------------------------------------------------
 from time import sleep
 
-SLEEP_TIME : float = 0.1
 
 def vanish(area : Text) -> None:
+    """ Clears visual text from text editor """
     # depends on starting symbol
     area.delete('1.2', 'end')
+
+class TextEditor():
+    """ Text editor(?) of Vanishink"""
+    buffer : str = ""
+    Keys : KeyHistory = KeyHistory()
+
+    def set_buffer(self, val: any) -> None:
+        self.buffer = val
 
 
 user_text = ""
 timer = None
 
-key_history : KeyHistory = KeyHistory() 
+Editor : TextEditor = TextEditor()
 
-EXIT_COMBO : str = "jk" 
+BUFFER_CLEAR_COMBO : str = "jk"
+WINDOW_EXIT_COMBO : str = "exit"
+SLEEP_TIME : float = 0.1
 
-def exit_combo_remove(text : str) -> None:
-    return "".join(text.split(EXIT_COMBO))
 
 def start_calculating(event):
     global timer, user_text
@@ -34,32 +43,40 @@ def start_calculating(event):
 
     if pressed_key == "BackSpace" and len(user_text):
         user_text = user_text[0: len(user_text) - 1]
-        key_history.remove()
+        Editor.Keys.remove()
     elif event.char:
         user_text += event.char
-        key_history.insert(event.char)
-        print(key_history.items)
+        Editor.set_buffer(Editor.buffer + event.char)
+        Editor.Keys.insert(event.char)
 
-    # previous: pressed_key == "period" or pressed_key == "Return"
     # TODO: idea -> by sentences
-    if key_history.is_combination_executed(EXIT_COMBO):
+    if Editor.Keys.is_combination_executed(BUFFER_CLEAR_COMBO):
         timer = window.after(10, reset_app)
     
-
+    if Editor.buffer == WINDOW_EXIT_COMBO:
+        close_window()
+    
     return
 
+def close_window() -> None:
+    window.destroy()
+    return
 
 def reset_app():
     global timer, user_text
-    vanish(typing_area)
     user_text += "\n"
     timer = None
-    key_history.clean()
+
+    vanish(typing_area)
+    Editor.Keys.clean()
+    Editor.set_buffer("")
+
     return
 
 
 def save_text_to_file(e=None):
     global user_text
+    print(user_text)
     if user_text == "":
         return
     try:
@@ -79,7 +96,7 @@ def save_text_to_file(e=None):
             text_to_write = f'\n{user_text}'
 
         with open('writeups.txt', 'a') as f:
-            f.write(exit_combo_remove(text_to_write))
+            f.write(String.remove_substring(text_to_write, BUFFER_CLEAR_COMBO))
             # user_text += "\n"
     finally:
         return
@@ -127,6 +144,7 @@ typing_area.insert("1.0", "$ ")
 typing_area.event_generate("<<Savingfile>>")
 typing_area.event_add('<<Savingfile>>', '<Control-s>')
 typing_area.bind('<<Savingfile>>', save_text_to_file)
+
 typing_area.bind('<KeyPress>', start_calculating)
 
 reset_btn = Button(text='Reset', fg=FG, bg=BG, font=PARA_FONT,
