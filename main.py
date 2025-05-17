@@ -76,7 +76,6 @@ def reset_app():
 
 def save_text_to_file(e=None):
     global user_text
-    print(user_text)
     if user_text == "":
         return
     try:
