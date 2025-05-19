@@ -3,7 +3,7 @@ class String():
 
     @staticmethod
     def is_empty(value: str) -> bool:
-        return value is None or value.strip() == ""
+        return len(value.strip()) <= 0
 
     @staticmethod
     def is_equal(value: str, expected: str, case_sensitive: bool = True) -> bool:

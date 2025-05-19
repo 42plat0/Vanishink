@@ -14,6 +14,7 @@ DONE:
 ___________________________________________________________________________
 ---FIX
 [fix] Saves and appends existing text without checking if its the same string
+[fix] Save only letters/numbers (not Return, Backspace, etc.)
 
 ---FEAT
 [feat] create config file data

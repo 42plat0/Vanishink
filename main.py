@@ -17,13 +17,13 @@ def vanish(area : Text) -> None:
 class TextEditor():
     """ Text editor(?) of Vanishink"""
     buffer : str = ""
+    display_text : str = ""
     Keys : KeyHistory = KeyHistory()
 
-    def set_buffer(self, val: any) -> None:
+    def set_buffer(self, val: str) -> None:
         self.buffer = val
 
 
-user_text = ""
 timer = None
 
 Editor : TextEditor = TextEditor()
@@ -34,19 +34,19 @@ SLEEP_TIME : float = 0.1
 
 
 def start_calculating(event):
-    global timer, user_text
+    global timer
     
     if timer is not None:
         window.after_cancel(timer)
 
     pressed_key : str = event.keysym
 
-    if String.is_equal(pressed_key, "BackSpace") and not String.is_empty(user_text):
-        user_text = user_text[0: len(user_text) - 1]
+    print(pressed_key)
+    if String.is_equal(pressed_key, "BackSpace") and not String.is_empty(Editor.display_text):
+        Editor.display_text = Editor.display_text[0 : len(Editor.display_text) - 1]
         Editor.Keys.remove()
     elif event.char:
-        user_text += event.char
-        Editor.set_buffer(Editor.buffer + event.char)
+        Editor.display_text += event.char
         Editor.Keys.insert(event.char)
 
     # TODO: idea -> by sentences
@@ -63,44 +63,40 @@ def close_window() -> None:
     return
 
 def reset_app():
-    global timer, user_text
-    user_text += "\n"
+    global timer
+    if not String.is_empty(Editor.buffer):
+        Editor.set_buffer(Editor.buffer + "\n")
+    Editor.set_buffer(Editor.buffer + Editor.display_text)
+
     timer = None
+    Editor.display_text = ""
 
     vanish(typing_area)
     Editor.Keys.clean()
-    Editor.set_buffer("")
-
     return
 
 
 def save_text_to_file(e=None):
-    global user_text
-    if user_text == "":
-        return
+    if not String.is_empty(Editor.display_text):
+        if String.is_empty(Editor.buffer):
+            Editor.set_buffer(Editor.display_text)
+        else:
+            Editor.set_buffer(Editor.buffer + Editor.display_text)
+
+    Editor.display_text = ""
+
     try:
         # TODO generating infinite files if one exists or show it exists and options to choose 
         f = open('writeups.txt', 'r')
     except FileNotFoundError:
         f = open('writeups.txt', 'w')
-        f.write(user_text)
-        user_text = ""
+        f.write(Editor.buffer)
         return
     else:
-        cont = f.read()
-        
-        if String.is_empty(cont):
-            text_to_write = user_text
-        # TODO -> check if text is the same? Can use an identifier when built as OOP
-        else:
-            text_to_write = f'\n{user_text}'
-
-        with open('writeups.txt', 'a') as f:
-            f.write(String.remove_substring(text_to_write, BUFFER_CLEAR_COMBO))
-            # user_text += "\n"
+        with open('writeups.txt', 'w') as f:
+            f.write(String.remove_substring(Editor.buffer, BUFFER_CLEAR_COMBO))
     finally:
         return
-
 
 # -----------------------------------------------------------------------------------------
 # UI SETUP
@@ -155,11 +151,6 @@ save_btn = Button(text='Save', fg=FG, bg=BG, font=PARA_FONT,
                    highlightbackground=FG, highlightcolor=FG, highlightthickness=0, border=3,
                    command=save_text_to_file, width=50)
 
-# heading.grid(row=0, column=0, columnspan=3)
-# instruction.grid(row=2, column=0, columnspan=3)
 typing_area.grid(row=3, column=0, columnspan=3)
-# reset_btn.grid(row=4, column=0)
-# save_btn.grid(row=4, column=2)
-
 
 window.mainloop()
