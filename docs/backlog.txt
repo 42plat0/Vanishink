@@ -1,7 +1,6 @@
 ---------------------------------------------------------------------------
 CURRENT:
     Getting to version 1: 
-    #--> [feat] Vanish text with more interesting effect  
     #--> [feat] File saving system
         // something more sound like preparing a dedicated folder, option of opening up a last note etc..
     #--> [feat] Adding config for keybindings
@@ -11,19 +10,29 @@ DONE:
     ++++ [feat] vanish func, saving to file text without exit combo
     ++++ [feat] Exiting program
     ++++ [feat] String validator
+    ++++ [fix] Saves and appends existing text without checking if its the same string
+    ++++ [feat] Vanish text with more interesting effect  
 ___________________________________________________________________________
 ---FIX
-[fix] Saves and appends existing text without checking if its the same string
 [fix] Save only letters/numbers (not Return, Backspace, etc.)
+[fix] Remove going to newline on Enter keybinding being display clear combo; default tkinter Text behavior?
+[fix] you should be able to quit window with some kind of keybinding
+[fix] move editor to its own file
 
 ---FEAT
-[feat] create config file data
+[feat] exciting typewriter sound on vanishing based on rhythm of clearing display text
+[feat] styling of window - paddings, colors, flashing of writing symbol
+[feat] focus on opening
 
----CHOR
-[chore] ...
+---CHOR - architecture 
+[chore] create config
+[chore] better design pattern 
+[chore] implement typechecking before interpreting, kind of like pyrefly 
+[chore] add style guide
+[chore] build some kind of development pipeline for github ci/cd 
 
 ---REFA
-[refactor]  ... 
+[refactor] move Tkinter to its own class usage
 
 ---TEST
 [test] write anything for anything, ever...

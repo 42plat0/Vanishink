@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter as Tkinter
 
 from imports.KeyHistory import KeyHistory
 from imports.utils.String import String
@@ -6,19 +7,40 @@ from imports.utils.String import String
 # -----------------------------------------------------------------------------------------
 # LOGIC
 # -----------------------------------------------------------------------------------------
-from time import sleep
 
+# Consts
+Tkinter.LAST = "end-1c" # except newline
 
-def vanish(area : Text) -> None:
+def get_text_in_area(area : Tkinter.Text, start_line_index: int = 0, char_line_index: int = 2) -> str:
+    start_from = str(start_line_index) + "." + str(char_line_index)
+    return area.get(start_from, Tkinter.LAST)
+
+# Decorate in future
+def vanish(area : Tkinter.Text) -> None:
     """ Clears visual text from text editor """
-    # depends on starting symbol
-    area.delete('1.2', 'end')
+    def run_vanish():
+        # depends on starting symbol
+        # Shouldn't it be Editor.displaytext? even though
+        if len(String.remove_substring(get_text_in_area(area), Editor.LINE_START)):
+            area.delete('1.2')
+            window.after(Editor.LINE_CLEAR_MS, run_vanish)
+    
+    run_vanish()
 
 class TextEditor():
-    """ Text editor(?) of Vanishink"""
+    """ Text editor of Vanishink"""
+    LINE_CONSTANT_SYMBOL = "$"
+    LINE_AFTER_C_SYMBOL = " "
+
+    LINE_START = f"{LINE_CONSTANT_SYMBOL}{LINE_AFTER_C_SYMBOL}"
+
+    LINE_CLEAR_MS = 30
+    
+    # Save text as mid point before saving to file on command
+    # Probably a file would be better in future
     buffer : str = ""
     display_text : str = ""
-    Keys : KeyHistory = KeyHistory()
+    keys : KeyHistory = KeyHistory()
 
     def set_buffer(self, val: str) -> None:
         self.buffer = val
@@ -28,29 +50,29 @@ timer = None
 
 Editor : TextEditor = TextEditor()
 
-BUFFER_CLEAR_COMBO : str = "jk"
+DISPLAY_CLEAR_COMBO : str = ["Return"]
 WINDOW_EXIT_COMBO : str = "exit"
+DELETE_BUTTON : str = "BackSpace" 
 SLEEP_TIME : float = 0.1
 
 
 def start_calculating(event):
     global timer
     
+    # Reset timer
     if timer is not None:
         window.after_cancel(timer)
 
     pressed_key : str = event.keysym
 
-    print(pressed_key)
-    if String.is_equal(pressed_key, "BackSpace") and not String.is_empty(Editor.display_text):
+    if String.is_equal(pressed_key, DELETE_BUTTON) and not String.is_empty(Editor.display_text):
         Editor.display_text = Editor.display_text[0 : len(Editor.display_text) - 1]
-        Editor.Keys.remove()
-    elif event.char:
+    elif event.char:                
+        # TODO: idea -> by sentences
+        Editor.keys.insert(pressed_key)
         Editor.display_text += event.char
-        Editor.Keys.insert(event.char)
 
-    # TODO: idea -> by sentences
-    if Editor.Keys.is_combination_executed(BUFFER_CLEAR_COMBO):
+    if Editor.keys.is_combination_executed(DISPLAY_CLEAR_COMBO):
         timer = window.after(10, reset_app)
     
     if String.is_equal(Editor.buffer, WINDOW_EXIT_COMBO): 
@@ -72,7 +94,7 @@ def reset_app():
     Editor.display_text = ""
 
     vanish(typing_area)
-    Editor.Keys.clean()
+    Editor.keys.clean()
     return
 
 
@@ -94,7 +116,7 @@ def save_text_to_file(e=None):
         return
     else:
         with open('writeups.txt', 'w') as f:
-            f.write(String.remove_substring(Editor.buffer, BUFFER_CLEAR_COMBO))
+            f.write(String.remove_substring(Editor.buffer, DISPLAY_CLEAR_COMBO))
     finally:
         return
 
@@ -124,18 +146,18 @@ HEAD_FONT = (FONT_FAMILY2, FONT_SIZE3, FONT_STYLE1)
 heading = "WRITE WITH MAGICAL INK"
 instruction = "If you don't press any key for 5 seconds, the text you have written will disappear"
 
-window = Tk()
+window = Tkinter.Tk()
 window.title('Vanishink')
 window.config(bg=BG, padx=0, pady=0)
 
-heading = Label(text=heading, font=HEAD_FONT, bg=BG, fg=FG, padx=0, pady=0)
-instruction = Label(text=instruction, font=PARA_FONT2, fg=FG, bg=BG, pady=0)
+heading = Tkinter.Label(text=heading, font=HEAD_FONT, bg=BG, fg=FG, padx=0, pady=0)
+instruction = Tkinter.Label(text=instruction, font=PARA_FONT2, fg=FG, bg=BG, pady=0)
 
-typing_area = Text(font=PARA_FONT,  bg=BG, fg=FG, width=100, height=15, wrap='w',
+typing_area = Tkinter.Text(font=PARA_FONT,  bg=BG, fg=FG, width=100, height=15, wrap='w',
                    highlightcolor=BORDER, highlightthickness=0, highlightbackground=BORDER,
                    padx=0, pady=0, insertbackground="#fff", insertborderwidth=0, insertwidth=10)
 
-typing_area.insert("1.0", "$ ")
+typing_area.insert("1.0", Editor.LINE_START)
 # TODO dynamic event generation plz:)
 typing_area.event_generate("<<Savingfile>>")
 typing_area.event_add('<<Savingfile>>', '<Control-s>')
@@ -143,11 +165,11 @@ typing_area.bind('<<Savingfile>>', save_text_to_file)
 
 typing_area.bind('<KeyPress>', start_calculating)
 
-reset_btn = Button(text='Reset', fg=FG, bg=BG, font=PARA_FONT,
+reset_btn = Tkinter.Button(text='Reset', fg=FG, bg=BG, font=PARA_FONT,
                    highlightbackground=FG, highlightcolor=FG, highlightthickness=0, border=3,
                    command=reset_app, width=50)
 
-save_btn = Button(text='Save', fg=FG, bg=BG, font=PARA_FONT,
+save_btn = Tkinter.Button(text='Save', fg=FG, bg=BG, font=PARA_FONT,
                    highlightbackground=FG, highlightcolor=FG, highlightthickness=0, border=3,
                    command=save_text_to_file, width=50)
 

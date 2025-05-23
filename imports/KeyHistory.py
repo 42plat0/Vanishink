@@ -19,17 +19,18 @@ class KeyHistory(Stack):
     def _get_items_string(self) -> str:
         hist_str = "" 
 
+        # TODO copy
         for i in range(self.get_size()):
             hist_str += self.items[i]
         
         return hist_str
     
-
     def is_combination_executed(self, combination : str) -> bool:
-        if not combination in self._get_items_string():
+        if len(self.items) <= 0:
             return False
         
         # TODO slicker version needed !
+        # copy-reverse compare
         for i in range(1, len(combination) + 1):
             if self.items[-i] != combination[-i]:
                 return False
